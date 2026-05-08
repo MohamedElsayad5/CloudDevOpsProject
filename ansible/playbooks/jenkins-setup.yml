@@ -7,4 +7,4 @@
     - java
     - jenkins
     - docker
-    - trivy
+    - trivycd
