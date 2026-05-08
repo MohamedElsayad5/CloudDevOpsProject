@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.log
+.env
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+*.tfstate.backup
+.terraform.lock.hcl
