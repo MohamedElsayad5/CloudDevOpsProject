@@ -1,4 +1,4 @@
-# CloudDevOpsProject
+
 <p align="center">
   <img src="static/logos/nti-logo.png" height="100"/>
   &nbsp;&nbsp;&nbsp;&nbsp;
