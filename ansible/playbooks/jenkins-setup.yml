@@ -1,3 +1,4 @@
+## old static inventory approach & im going to switch to dynamic inventory approach using terraform and ansible inventory plugin
 ---
 - name: Configure Jenkins Server
   hosts: jenkins
