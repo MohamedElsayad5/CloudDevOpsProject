@@ -9,3 +9,8 @@ variable "public_subnet_cidr" {
 variable "private_subnet_cidr" {
   type = string
 }
+
+variable "az" {
+  type    = string
+  default = "us-east-1a"
+}
