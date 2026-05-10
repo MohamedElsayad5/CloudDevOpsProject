@@ -23,3 +23,18 @@ module "jenkins" {
   key_name          = var.key_name
   name              = "jenkins-server"
 }
+module "ecr" {
+  source = "./modules/ecr"
+
+  repo_name = "jenkins-app"
+}
+
+module "eks" {
+  source = "./modules/eks"
+
+  cluster_name      = "devops-cluster"
+  subnet_ids        = [
+    module.network.public_subnet_id
+  ]
+  node_instance_type = "t3.medium"
+}
