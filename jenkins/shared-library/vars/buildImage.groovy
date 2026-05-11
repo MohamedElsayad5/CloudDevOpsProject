@@ -1,3 +1,4 @@
 def call(imageName, tag) {
-    sh "docker build -t myapp:${env.BUILD_NUMBER} -f FinalProject/Dockerfile FinalProject"
+    // الحل الأضمن: تحديد مسار الملف ومسار السياق بوضوح
+sh "docker build -t myapp:17 -f ${WORKSPACE}/FinalProject/Dockerfile ${WORKSPACE}/FinalProject"
 }
