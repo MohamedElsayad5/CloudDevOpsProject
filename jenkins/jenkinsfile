@@ -22,7 +22,7 @@ pipeline {
                 checkout([$class: 'GitSCM',
                     branches: [[name: 'main']],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/MohamedElsayad5/FinalProject.git',
+                        url: 'https://github.com/MohamedElsayad5/CloudDevOpsProject.git',
                         credentialsId: 'github-token'
                     ]]
                 ])
@@ -31,22 +31,18 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                script {
-                    sh """
-                        cd ${APP_DIR} && \
-                        docker build -t ${REPO}:${TAG} .
-                    """
-                }
+                sh """
+                    cd ${APP_DIR} && \
+                    docker build -t ${REPO}:${TAG} .
+                """
             }
         }
 
         stage('Scan Image (Trivy)') {
             steps {
-                script {
-                    sh """
-                        trivy image ${REPO}:${TAG}
-                    """
-                }
+                sh """
+                    trivy image ${REPO}:${TAG}
+                """
             }
         }
 
@@ -61,22 +57,18 @@ pipeline {
 
         stage('Push to ECR') {
             steps {
-                script {
-                    sh """
-                        docker tag ${REPO}:${TAG} ${ECR_URL}:${TAG}
-                        docker push ${ECR_URL}:${TAG}
-                    """
-                }
+                sh """
+                    docker tag ${REPO}:${TAG} ${ECR_URL}:${TAG}
+                    docker push ${ECR_URL}:${TAG}
+                """
             }
         }
 
         stage('Update Kubernetes Manifest') {
             steps {
-                script {
-                    sh """
-                        sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_FILE}
-                    """
-                }
+                sh """
+                    sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_FILE}
+                """
             }
         }
 
