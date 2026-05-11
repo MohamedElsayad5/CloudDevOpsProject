@@ -10,7 +10,7 @@ pipeline {
         TAG = "${BUILD_NUMBER}"
         K8S_FILE = "k8s/Deployment.yaml"
         APP_DIR = "FinalProject"
-        CLUSTER_NAME = "your-eks-cluster-name"
+        CLUSTER_NAME = "devops-cluster"
     }
 
     stages {
