@@ -7,28 +7,35 @@ pipeline {
         AWS_REGION = "us-east-1"
         REPO = "myapp"
 
-        // ECR repo URL (replace if needed)
         ECR_URL = "405161739227.dkr.ecr.us-east-1.amazonaws.com/myapp"
 
-        // Versioning strategy (BEST PRACTICE)
         TAG = "${BUILD_NUMBER}"
-        
-        // K8s manifest path
+
         K8S_FILE = "k8s/Deployment.yaml"
+        APP_DIR = "FinalProject"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/MohamedElsayad5/FinalProject.git'
+                checkout([$class: 'GitSCM',
+                    branches: [[name: 'main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/MohamedElsayad5/FinalProject.git',
+                        credentialsId: 'github-token'
+                    ]]
+                ])
             }
         }
 
         stage('Build Image') {
             steps {
                 script {
-                    buildImage(env.REPO, env.TAG)
+                    sh """
+                        cd ${APP_DIR} && \
+                        docker build -t ${REPO}:${TAG} .
+                    """
                 }
             }
         }
@@ -36,15 +43,29 @@ pipeline {
         stage('Scan Image (Trivy)') {
             steps {
                 script {
-                    scanImage(env.REPO, env.TAG)
+                    sh """
+                        trivy image ${REPO}:${TAG}
+                    """
                 }
+            }
+        }
+
+        stage('Login to ECR') {
+            steps {
+                sh """
+                    aws ecr get-login-password --region ${AWS_REGION} | \
+                    docker login --username AWS --password-stdin ${ECR_URL.split('/')[0]}
+                """
             }
         }
 
         stage('Push to ECR') {
             steps {
                 script {
-                    pushECR(env.ECR_URL, env.REPO, env.TAG)
+                    sh """
+                        docker tag ${REPO}:${TAG} ${ECR_URL}:${TAG}
+                        docker push ${ECR_URL}:${TAG}
+                    """
                 }
             }
         }
@@ -52,10 +73,9 @@ pipeline {
         stage('Update Kubernetes Manifest') {
             steps {
                 script {
-                    updateManifest(
-                        env.K8S_FILE,
-                        "${env.ECR_URL}:${env.TAG}"
-                    )
+                    sh """
+                        sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_FILE}
+                    """
                 }
             }
         }
@@ -68,7 +88,7 @@ pipeline {
         }
 
         failure {
-            echo "❌ Pipeline failed. Check logs."
+            echo "❌ Pipeline failed!"
         }
     }
 }
