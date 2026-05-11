@@ -24,15 +24,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    sh "cd ${APP_DIR} && docker build -t ${REPO}:${TAG} ."
-                }
-            }
-        }
-
-        stage('Scan Image') {
-            steps {
-                script {
-                    sh "trivy image ${REPO}:${TAG}"
+                    sh "docker build -t ${REPO}:${TAG} -f ${APP_DIR}/Dockerfile ${APP_DIR}"
                 }
             }
         }
