@@ -4,9 +4,9 @@ metadata:
   name: app-service
   namespace: ivolve
 spec:
+  type: LoadBalancer
   selector:
     app: myapp
   ports:
     - port: 80
-      targetPort: 80
-  type: ClusterIP
+      targetPort: 5000

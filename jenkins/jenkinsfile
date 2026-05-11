@@ -6,43 +6,34 @@ pipeline {
     environment {
         AWS_REGION = "us-east-1"
         REPO = "myapp"
-
         ECR_URL = "405161739227.dkr.ecr.us-east-1.amazonaws.com/myapp"
-
         TAG = "${BUILD_NUMBER}"
-
         K8S_FILE = "k8s/Deployment.yaml"
         APP_DIR = "FinalProject"
+        CLUSTER_NAME = "your-eks-cluster-name"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                checkout([$class: 'GitSCM',
-                    branches: [[name: 'main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/MohamedElsayad5/CloudDevOpsProject.git',
-                        credentialsId: 'github-token'
-                    ]]
-                ])
+                checkout scm
             }
         }
 
         stage('Build Image') {
             steps {
-                sh """
-                    cd ${APP_DIR} && \
-                    docker build -t ${REPO}:${TAG} .
-                """
+                script {
+                    sh "cd ${APP_DIR} && docker build -t ${REPO}:${TAG} ."
+                }
             }
         }
 
-        stage('Scan Image (Trivy)') {
+        stage('Scan Image') {
             steps {
-                sh """
-                    trivy image ${REPO}:${TAG}
-                """
+                script {
+                    sh "trivy image ${REPO}:${TAG}"
+                }
             }
         }
 
@@ -55,7 +46,7 @@ pipeline {
             }
         }
 
-        stage('Push to ECR') {
+        stage('Push Image to ECR') {
             steps {
                 sh """
                     docker tag ${REPO}:${TAG} ${ECR_URL}:${TAG}
@@ -72,6 +63,14 @@ pipeline {
             }
         }
 
+        stage('Deploy to EKS') {
+            steps {
+                sh """
+                    aws eks update-kubeconfig --name ${CLUSTER_NAME} --region ${AWS_REGION}
+                    kubectl apply -f k8s/
+                """
+            }
+        }
     }
 
     post {
