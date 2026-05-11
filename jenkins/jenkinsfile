@@ -6,6 +6,15 @@ pipeline {
     environment {
         AWS_REGION = "us-east-1"
         REPO = "myapp"
+
+        // ECR repo URL (replace if needed)
+        ECR_URL = "405161739227.dkr.ecr.us-east-1.amazonaws.com/myapp"
+
+        // Versioning strategy (BEST PRACTICE)
+        TAG = "${BUILD_NUMBER}"
+        
+        // K8s manifest path
+        K8S_FILE = "k8s/Deployment.yaml"
     }
 
     stages {
@@ -19,15 +28,15 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    buildImage()
+                    buildImage(env.REPO, env.TAG)
                 }
             }
         }
 
-        stage('Scan Image') {
+        stage('Scan Image (Trivy)') {
             steps {
                 script {
-                    scanImage()
+                    scanImage(env.REPO, env.TAG)
                 }
             }
         }
@@ -35,17 +44,31 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 script {
-                    pushECR()
+                    pushECR(env.ECR_URL, env.REPO, env.TAG)
                 }
             }
         }
 
-        stage('Update Manifest') {
+        stage('Update Kubernetes Manifest') {
             steps {
                 script {
-                    updateManifest()
+                    updateManifest(
+                        env.K8S_FILE,
+                        "${env.ECR_URL}:${env.TAG}"
+                    )
                 }
             }
+        }
+
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully!"
+        }
+
+        failure {
+            echo "❌ Pipeline failed. Check logs."
         }
     }
 }
