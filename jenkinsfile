@@ -24,7 +24,12 @@ pipeline {
         stage('Build Image') {
             steps {
                 script {
-                    sh "docker build -t ${REPO}:${TAG} -f ${APP_DIR}/Dockerfile ${APP_DIR}"
+                    // هذا السطر سيكشف لنا كل شيء
+                    sh "ls -la" 
+                    sh "find . -name Dockerfile"
+                    
+                    // سنقوم بالبناء باستخدام المسار الذي سيجده أمر find
+                    sh "docker build -t ${REPO}:${TAG} -f FinalProject/Dockerfile FinalProject"
                 }
             }
         }
