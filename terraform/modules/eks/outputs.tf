@@ -1,11 +1,7 @@
 output "cluster_name" {
-  value = aws_eks_cluster.this.name
+  value = aws_eks_cluster.devops-cluster.name
 }
 
 output "cluster_endpoint" {
-  value = aws_eks_cluster.this.endpoint
-}
-
-output "cluster_id" {
-  value = aws_eks_cluster.this.id
+  value = aws_eks_cluster.devops-cluster.endpoint
 }

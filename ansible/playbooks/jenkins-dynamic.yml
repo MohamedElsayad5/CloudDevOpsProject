@@ -1,7 +1,22 @@
 ---
 - name: Configure Jenkins Server
-  hosts: tag_Name_jenkins-server
+  hosts: tag_jenkins_server
   become: yes
+
+  pre_tasks:
+    - name: Clean up broken Jenkins repository and keys
+      shell: |
+        rm -f /etc/apt/sources.list.d/jenkins.list
+        rm -f /etc/apt/sources.list.d/*jenkins*
+        apt-key del 7198F4B714ABFC68 || true
+        rm -rf /var/lib/apt/lists/*
+        apt-get clean
+      # حذفنا warn: false لحل خطأ Unsupported parameters
+
+    - name: Ensure apt cache is updated after cleanup
+      apt:
+        update_cache: yes
+      # هذه الخطوة ستجعل Java role يبدأ والسيرفر نظيف تماماً
 
   roles:
     - java

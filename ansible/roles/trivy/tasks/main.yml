@@ -1,25 +1,34 @@
 ---
-- name: Install required packages
+- name: Install dependencies
   apt:
     name:
       - wget
       - gnupg
       - lsb-release
+      - ca-certificates
     state: present
     update_cache: yes
 
-- name: Add Trivy GPG key
-  apt_key:
+- name: Ensure keyring directory exists
+  file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Trivy key
+  get_url:
     url: https://aquasecurity.github.io/trivy-repo/deb/public.key
-    state: present
+    dest: /tmp/trivy.key
+    mode: '0644'
+
+- name: Convert Trivy key
+  command: gpg --dearmor -o /usr/share/keyrings/trivy.gpg /tmp/trivy.key
 
 - name: Add Trivy repository
   apt_repository:
-    repo: "deb https://aquasecurity.github.io/trivy-repo/deb {{ ansible_distribution_release }} main"
+    repo: "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb {{ ansible_distribution_release }} main"
     state: present
-
-- name: Update apt cache
-  apt:
+    filename: trivy
     update_cache: yes
 
 - name: Install Trivy

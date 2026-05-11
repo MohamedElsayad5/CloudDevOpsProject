@@ -18,16 +18,23 @@ resource "aws_iam_role_policy_attachment" "cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-resource "aws_eks_cluster" "this" {
+resource "aws_eks_cluster" "devops-cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids = var.subnet_ids
-  }
+  subnet_ids = var.subnet_ids
 
-  depends_on = [aws_iam_role_policy_attachment.cluster_policy]
+  endpoint_public_access  = true
+  endpoint_private_access = true
 }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cluster_policy
+  ]
+}
+
+# ================= NODE ROLE =================
 
 resource "aws_iam_role" "eks_node_role" {
   name = "${var.cluster_name}-node-role"
@@ -59,10 +66,14 @@ resource "aws_iam_role_policy_attachment" "ecr_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
+# ================= NODE GROUP =================
+
 resource "aws_eks_node_group" "this" {
-  cluster_name    = aws_eks_cluster.this.name
-  node_role_arn   = aws_iam_role.eks_node_role.arn
-  subnet_ids      = var.subnet_ids
+  cluster_name  = aws_eks_cluster.devops-cluster.name
+  node_role_arn = aws_iam_role.eks_node_role.arn
+
+  # IMPORTANT: must be multi-AZ subnets
+  subnet_ids = var.subnet_ids
 
   scaling_config {
     desired_size = 2
