@@ -5,78 +5,70 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        REPO = "myapp"
+        REPO_NAME = "myapp"
         ECR_URL = "405161739227.dkr.ecr.us-east-1.amazonaws.com/myapp"
         TAG = "${BUILD_NUMBER}"
-        K8S_FILE = "k8s/Deployment.yaml"
-        APP_DIR = "FinalProject"
-        CLUSTER_NAME = "devops-cluster"
+        K8S_DIR = "k8s"
+        GIT_REPO_URL = "github.com/MohamedElsayad5/CloudDevOpsProject.git"
+       
+        GIT_CRED_ID = "github-token" 
+    }
+
+    
+    triggers {
+        githubPush()
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Build Image') {
+        stage('Build & Tag Image') {
             steps {
                 script {
-                    // هذا السطر سيكشف لنا كل شيء
-                    sh "ls -la" 
-                    sh "find . -name Dockerfile"
-                    
-                    // سنقوم بالبناء باستخدام المسار الذي سيجده أمر find
-                    sh "docker build -t ${REPO}:${TAG} -f FinalProject/Dockerfile FinalProject"
+                    sh "docker build -t ${REPO_NAME}:${TAG} -f FinalProject/Dockerfile FinalProject"
                 }
             }
         }
 
-        stage('Login to ECR') {
+        stage('Push to ECR') {
             steps {
                 sh """
                     aws ecr get-login-password --region ${AWS_REGION} | \
                     docker login --username AWS --password-stdin ${ECR_URL.split('/')[0]}
-                """
-            }
-        }
-
-        stage('Push Image to ECR') {
-            steps {
-                sh """
-                    docker tag ${REPO}:${TAG} ${ECR_URL}:${TAG}
+                    docker tag ${REPO_NAME}:${TAG} ${ECR_URL}:${TAG}
                     docker push ${ECR_URL}:${TAG}
                 """
             }
         }
 
-        stage('Update Kubernetes Manifest') {
+        stage('Update Manifest & Git Push') {
             steps {
-                sh """
-                    sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_FILE}
-                """
-            }
-        }
-
-        stage('Deploy to EKS') {
-            steps {
-                sh """
-                    aws eks update-kubeconfig --name ${CLUSTER_NAME} --region ${AWS_REGION}
-                    kubectl apply -f k8s/ --validate=false
-                """
+                script {
+                   
+                    sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
+                    
+                
+                    withCredentials([usernamePassword(credentialsId: "${GIT_CRED_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh """
+                            git config user.email "jenkins@example.com"
+                            git config user.name "Jenkins CI"
+                            git add ${K8S_DIR}/Deployment.yaml
+                            git commit -m "Update image tag to ${TAG} [skip ci]"
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${GIT_REPO_URL} HEAD:main
+                        """
+                    }
+                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ Pipeline completed successfully!"
-        }
-
-        failure {
-            echo "❌ Pipeline failed!"
+            echo "✅ CI/CD Cycle finished. ArgoCD will now sync the changes!"
         }
     }
 }
