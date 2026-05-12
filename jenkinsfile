@@ -2,6 +2,10 @@
 
 pipeline {
     agent any
+    
+    triggers {
+        githubPush() // دي اللي بتخلي جينكنز يشتغل أول ما تعمل push
+    }
 
     environment {
         AWS_REGION = "us-east-1"
@@ -10,13 +14,7 @@ pipeline {
         TAG = "${BUILD_NUMBER}"
         K8S_DIR = "k8s"
         GIT_REPO_URL = "github.com/MohamedElsayad5/CloudDevOpsProject.git"
-       
         GIT_CRED_ID = "github-token" 
-    }
-
-    
-    triggers {
-        githubPush()
     }
 
     stages {
@@ -25,15 +23,11 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Build & Tag Image') {
+        stage('Build Image') {
             steps {
-                script {
-                    sh "docker build -t ${REPO_NAME}:${TAG} -f FinalProject/Dockerfile FinalProject"
-                }
+                sh "docker build -t ${REPO_NAME}:${TAG} -f FinalProject/Dockerfile FinalProject"
             }
         }
-
         stage('Push to ECR') {
             steps {
                 sh """
@@ -44,31 +38,11 @@ pipeline {
                 """
             }
         }
-
-        stage('Update Manifest & Git Push') {
+        stage('Update Manifest') {
             steps {
-                script {
-                   
-                    sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
-                    
-                
-                    withCredentials([usernamePassword(credentialsId: "${GIT_CRED_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        sh """
-                            git config user.email "jenkins@example.com"
-                            git config user.name "Jenkins CI"
-                            git add ${K8S_DIR}/Deployment.yaml
-                            git commit -m "Update image tag to ${TAG} [skip ci]"
-                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${GIT_REPO_URL} HEAD:main
-                        """
-                    }
-                }
+                // تعديل ملف الـ Deployment برقم الـ Tag الجديد
+                sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
             }
-        }
-    }
-
-    post {
-        success {
-            echo "✅ CI/CD Cycle finished. ArgoCD will now sync the changes!"
         }
     }
 }
