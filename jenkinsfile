@@ -4,7 +4,8 @@ pipeline {
     agent any
     
     triggers {
-        githubPush() 
+        // هنخلي جينكنز يشيك كل دقيقة، بس الفلتر الحقيقي هيكون من إعدادات الـ Job
+        pollSCM('* * * * *') 
     }
 
     environment {
