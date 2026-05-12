@@ -4,8 +4,9 @@ pipeline {
     agent any
     
     triggers {
-        // هنخلي جينكنز يشيك كل دقيقة، بس الفلتر الحقيقي هيكون من إعدادات الـ Job
-        pollSCM('* * * * *') 
+       
+       
+        githubPush() 
     }
 
     environment {
@@ -19,18 +20,27 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout & Filter') {
             steps {
-                checkout scm
+                script {
+                    checkout scm
+                    
+                    def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
+                    echo "Commit author: ${author}"
+                    
+                    
+                    if (author == "Jenkins CI") {
+                        echo "Build triggered by Jenkins automation. Stopping to prevent loop."
+                        currentBuild.result = 'ABORTED'
+                        error("Loop prevented")
+                    }
+                }
             }
         }
-
+        
         stage('Build Image') {
-            steps {
-                sh "docker build -t ${REPO_NAME}:${TAG} -f FinalProject/Dockerfile FinalProject"
-            }
+            steps { sh "docker build -t ${REPO_NAME}:${TAG} -f FinalProject/Dockerfile FinalProject" }
         }
-
         stage('Push to ECR') {
             steps {
                 sh """
@@ -41,18 +51,16 @@ pipeline {
                 """
             }
         }
-
-        stage('Update Manifest & Push to Git') {
+        stage('Update Manifest & Push') {
             steps {
                 script {
                     sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
-                    
                     withCredentials([usernamePassword(credentialsId: "${GIT_CRED_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh """
                             git config user.email "jenkins@example.com"
                             git config user.name "Jenkins CI"
                             git add ${K8S_DIR}/Deployment.yaml
-                            git commit -m "Update image tag to ${TAG} [skip ci]" || echo "No changes to commit"
+                            git commit -m "Update image tag to ${TAG} [skip ci]" || echo "No changes"
                             git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${GIT_REPO_URL} HEAD:main
                         """
                     }
