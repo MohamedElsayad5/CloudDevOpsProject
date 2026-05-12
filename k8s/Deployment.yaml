@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: myapp
-          image: 405161739227.dkr.ecr.us-east-1.amazonaws.com/myapp:5
+          image: 405161739227.dkr.ecr.us-east-1.amazonaws.com/myapp:6
           ports:
             - containerPort: 5000
