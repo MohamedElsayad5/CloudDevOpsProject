@@ -17,12 +17,19 @@ pipeline {
         GIT_CRED_ID = "github-token" 
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
+    stage('Checkout') {
+    steps {
+        script {
+            checkout scm
+            def lastCommit = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+            if (lastCommit.contains("[skip ci]")) {
+                echo "Self-generated commit detected. Stopping to prevent loop."
+                currentBuild.result = 'SUCCESS'
+                return 
             }
         }
+    }
+}
 
         stage('Build Image') {
             steps {
