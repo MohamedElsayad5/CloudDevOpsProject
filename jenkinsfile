@@ -4,7 +4,7 @@ pipeline {
     agent any
     
     triggers {
-        githubPush() // دي اللي بتخلي جينكنز يشتغل أول ما تعمل push
+        githubPush() 
     }
 
     environment {
@@ -28,21 +28,22 @@ pipeline {
                 sh "docker build -t ${REPO_NAME}:${TAG} -f FinalProject/Dockerfile FinalProject"
             }
         }
-        stage('Push to ECR') {
+        stage('Update Manifest & Push to Git') {
             steps {
-                sh """
-                    aws ecr get-login-password --region ${AWS_REGION} | \
-                    docker login --username AWS --password-stdin ${ECR_URL.split('/')[0]}
-                    docker tag ${REPO_NAME}:${TAG} ${ECR_URL}:${TAG}
-                    docker push ${ECR_URL}:${TAG}
-                """
+                script {
+                    
+                    sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
+                    
+                    
+                    withCredentials([usernamePassword(credentialsId: "${GIT_CRED_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                        sh """
+                            git config user.email "jenkins@example.com"
+                            git config user.name "Jenkins CI"
+                            git add ${K8S_DIR}/Deployment.yaml
+                            git commit -m "Update image tag to ${TAG} [skip ci]"
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@${GIT_REPO_URL} HEAD:main
+                        """
+                    }
+                }
             }
         }
-        stage('Update Manifest') {
-            steps {
-                // تعديل ملف الـ Deployment برقم الـ Tag الجديد
-                sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
-            }
-        }
-    }
-}
