@@ -17,19 +17,25 @@ pipeline {
         GIT_CRED_ID = "github-token" 
     }
 
-    stage('Checkout') {
-    steps {
-        script {
-            checkout scm
-            def lastCommit = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
-            if (lastCommit.contains("[skip ci]")) {
-                echo "Self-generated commit detected. Stopping to prevent loop."
-                currentBuild.result = 'SUCCESS'
-                return 
+    stages {
+        stage('Checkout & Anti-Loop Check') {
+            steps {
+                script {
+                    checkout scm
+                   
+                    def commitMsg = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+                    echo "Last commit message: ${commitMsg}"
+                    
+                    
+                    if (commitMsg.contains("[skip ci]")) {
+                        echo "Anti-loop trigger: skipping this build."
+                        currentBuild.result = 'SUCCESS'
+                        
+                        error("Stopping build to prevent infinite loop.")
+                    }
+                }
             }
         }
-    }
-}
 
         stage('Build Image') {
             steps {
@@ -51,10 +57,10 @@ pipeline {
         stage('Update Manifest & Push to Git') {
             steps {
                 script {
-                   
+                    
                     sh "sed -i 's|image: .*|image: ${ECR_URL}:${TAG}|g' ${K8S_DIR}/Deployment.yaml"
                     
-                    
+                   
                     withCredentials([usernamePassword(credentialsId: "${GIT_CRED_ID}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                         sh """
                             git config user.email "jenkins@example.com"
@@ -71,10 +77,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ CI/CD Cycle finished successfully!"
+            echo "✅ Pipeline finished successfully!"
         }
-        failure {
-            echo "❌ Pipeline failed. Check logs for details."
+        aborted {
+            echo "ℹ️ Pipeline stopped early to prevent loop."
         }
     }
 }
