@@ -528,25 +528,6 @@ kubectl describe svc ivolve-svc -n ivolve
 
 ---
 
-## Destroy Infrastructure
-
-To destroy all created AWS infrastructure resources safely, run:
-
-```bash
-cd terraform
-
-terraform destroy
-```
-
-### Auto Approve Destroy
-
-```bash
-terraform destroy -auto-approve
-```
-
-![terraform destroy](images/terraform_destroy.png)
-
-```
 ## 🎯 Key Features
 
 <div align="center">
