@@ -527,7 +527,24 @@ kubectl describe svc ivolve-svc -n ivolve
 ```
 
 ---
+## Destroy Infrastructure
 
+To destroy all created AWS infrastructure resources safely, run:
+
+```bash
+cd terraform
+
+terraform destroy
+```
+
+### Auto Approve Destroy
+
+```bash
+terraform destroy -auto-approve
+```
+
+![terraform destroy](images/terraform_destroy.png)
+---
 ## 🎯 Key Features
 
 <div align="center">
@@ -605,18 +622,18 @@ kubectl describe svc ivolve-svc -n ivolve
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    ✨ ACHIEVEMENTS ✨                        │
+│                    ✨ ACHIEVEMENTS ✨                       │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
+│                                                             │
 │  ✅ Fully Automated CI/CD Pipeline                          │
-│  ✅ Production-Grade Infrastructure                          │
-│  ✅ Zero-Downtime Deployments                                │
-│  ✅ GitOps Best Practices                                    │
-│  ✅ Infrastructure as Code                                   │
-│  ✅ Security-First Approach                                  │
-│  ✅ Scalable Architecture                                    │
-│  ✅ Disaster Recovery Ready                                  │
-│                                                              │
+│  ✅ Production-Grade Infrastructure                         │
+│  ✅ Zero-Downtime Deployments                               │
+│  ✅ GitOps Best Practices                                   │
+│  ✅ Infrastructure as Code                                  │
+│  ✅ Security-First Approach                                 │
+│  ✅ Scalable Architecture                                   │
+│  ✅ Disaster Recovery Ready                                 │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -768,22 +785,22 @@ For mentorship, guidance, and industry best practices
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                                                                  │
-│     🎉 This project successfully demonstrates a complete         │
-│        production-ready GitOps CI/CD pipeline using:             │
-│                                                                  │
-│           ✨ jenkins for Continuous Integration           │
-│           🐳 DockerHub for Image Management                      │
-│           🔄 ArgoCD for GitOps Delivery                          │
-│           ☁️ AWS EKS for Kubernetes Orchestration                │
-│           🏗️ Terraform for Infrastructure as Code                │
-│                                                                  │
-│     Every code change automatically triggers:                    │
-│     Build → Scan → Push → Update → Sync → Deploy               │
-│                                                                  │
-│     This ensures consistent, automated, and                      │
-│     production-grade delivery! 🚀                                │
-│                                                                  │
+│                                                                 │
+│     🎉 This project successfully demonstrates a complete        │
+│        production-ready GitOps CI/CD pipeline using:            │
+│                                                                 │
+│           ✨ jenkins for Continuous Integration                 │
+│           🐳 DockerHub for Image Management                     │
+│           🔄 ArgoCD for GitOps Delivery                         │
+│           ☁️ AWS EKS for Kubernetes Orchestration               │
+│           🏗️ Terraform for Infrastructure as Code               │
+│                                                                 │
+│     Every code change automatically triggers:                   │
+│     Build → Scan → Push → Update → Sync → Deploy                │
+│                                                                 │
+│     This ensures consistent, automated, and                     │
+│     production-grade delivery! 🚀                               │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
