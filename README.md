@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="![alt text](images/ivolve-logo copy.png)" height="120"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="![alt text](images/nti-logo copy.png)" height="120"/>
+  <img src="images/ivolve-logo.png" height="120"/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="images/nti-logo.png" height="120"/>
 </p>
 
 <h1 align="center">
@@ -155,6 +155,9 @@ CloudDevOpsProject/
 │       └── server/
 │
 └── README.md
+
+---
+````
 
 ### 🏛️ **Components Breakdown**
 
