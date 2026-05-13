@@ -539,9 +539,9 @@ terraform destroy
 
 terraform destroy -auto-approve
 
-<img src="images/terraform_destroy.png" width="1000"/> ```
+![terraform destroy](images/terraform_destroy.png)
 
----
+```
 ## 🎯 Key Features
 
 <div align="center">
