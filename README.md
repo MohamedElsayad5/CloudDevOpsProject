@@ -1,4 +1,4 @@
-<<p align="center">
+<p align="center">
   <img src="![alt text](images/ivolve-logo copy.png)" height="120"/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="![alt text](images/nti-logo copy.png)" height="120"/>
