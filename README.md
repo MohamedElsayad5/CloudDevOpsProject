@@ -536,8 +536,13 @@ To destroy all created AWS infrastructure resources safely, run:
 cd terraform
 
 terraform destroy
+```
 
+### Auto Approve Destroy
+
+```bash
 terraform destroy -auto-approve
+```
 
 ![terraform destroy](images/terraform_destroy.png)
 
