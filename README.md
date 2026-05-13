@@ -1,7 +1,7 @@
 <<p align="center">
-  <img src="![alt text](images/ivolve-logo.png)" height="120"/>
+  <img src="![alt text](images/ivolve-logo copy.png)" height="120"/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="![alt text](images/nti-logo.png)" height="120"/>
+  <img src="![alt text](images/nti-logo copy.png)" height="120"/>
 </p>
 
 <h1 align="center">
@@ -80,7 +80,7 @@
 
 <div align="center">
 
-![Architecture Diagram](images/Project-Architecture.png)
+![Architecture Diagram](images/architecture.png)
 
 </div>
 
@@ -198,7 +198,7 @@ graph TB
 ```mermaid
 graph LR
     A[👨‍💻 Developer] -->|Push Code| B[GitHub]
-    B -->|Trigger| C[🤖 GitHub Actions]
+    B -->|Trigger| C[🤖 jenkins]
     C -->|Build| D[🐳 Docker Image]
     D -->|Scan| E[🔍 Security Check]
     E -->|Push| F[📦 DockerHub]
@@ -796,9 +796,9 @@ For mentorship, guidance, and industry best practices
 
 ### 📧 Contact
 
-**Email:** your.email@example.com  
-**LinkedIn:** [Your Profile](https://www.linkedin.com/in/mohamed-mahamoud-elsayad/)  
-**GitHub:** [@yourusername](hhttps://github.com/MohamedElsayad5)
+*   **Email:** [moeyelsayad777@gmail.com](mailto:moeyelsayad777@gmail.com)
+*   **LinkedIn:** [Mohamed Elsayad](https://www.linkedin.com/in/mohamed-mahamoud-elsayad/)
+*   **GitHub:** [MohamedElsayad5](https://github.com/MohamedElsayad5)
 
 ---
 
