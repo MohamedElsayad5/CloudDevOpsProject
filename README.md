@@ -80,7 +80,7 @@
 
 <div align="center">
 
-![Architecture Diagram](images/architecture.png)
+![Architecture Diagram](images/diagram.png)
 
 </div>
 
