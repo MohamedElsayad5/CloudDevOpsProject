@@ -239,7 +239,7 @@ graph LR
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│                         🚀 AUTOMATED DEPLOYMENT PIPELINE                      │
+│                         🚀 AUTOMATED DEPLOYMENT PIPELINE                     │
 └──────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -269,7 +269,7 @@ git push origin main
 <td width="10%" align="center"><h3>2️⃣</h3></td>
 <td width="90%">
 
-#### 🤖 **GitHub Actions Pipeline**
+#### 🤖 **Jenkins Pipeline**
 
 ```yaml
 Pipeline Steps:
